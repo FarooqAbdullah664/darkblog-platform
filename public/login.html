@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - DarkBlog</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <nav class="nav">
+    <div class="brand"><div class="logo">DB</div><div><div style="font-weight:700">DarkBlog</div><div style="font-size:12px;color:var(--muted)">Login</div></div></div>
+    <div class="nav-links">
+      <a class="btn" href="/index.html">Home</a>
+      <a class="btn" href="/signup.html">Signup</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <form id="loginForm" class="card">
+      <h2 style="text-align:center;color:var(--accent)">Welcome back</h2>
+      <input class="input" id="email" type="email" placeholder="Email" required />
+      <input class="input" id="password" type="password" placeholder="Password" required />
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-primary" type="submit">Login</button>
+        <div id="msg" style="color:var(--muted)"></div>
+      </div>
+    </form>
+  </div>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  const msg = document.getElementById("msg");
+  msg.innerText = "";
+
+  try {
+    const res = await axios.post("/api/login", { email, password });
+    const { token, role, fullName } = res.data;
+    // store token + role + name
+    localStorage.setItem("token", token);
+    localStorage.setItem("role", role);
+    localStorage.setItem("fullName", fullName);
+    // redirect to dashboard
+    location.href = "/dashboard.html";
+  } catch(err) {
+    msg.style.color = "#ff8080";
+    msg.innerText = err.response?.data?.message || "Login failed";
+  }
+});
+</script>
+</body>
+</html>
