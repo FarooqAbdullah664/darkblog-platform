@@ -1,57 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Create Post - DarkBlog</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Write Post — DarkBlog</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-  <nav class="nav">
-    <div class="brand"><div class="logo">DB</div><div><div style="font-weight:700">DarkBlog</div><div style="font-size:12px;color:var(--muted)">Create</div></div></div>
-    <div class="nav-links">
-      <a class="btn" href="/index.html">Home</a>
-      <a class="btn" href="/dashboard.html">Dashboard</a>
-      <a class="btn" href="/login.html">Login</a>
-    </div>
-  </nav>
 
-  <div class="container">
-    <form id="createForm" class="card">
-      <h2 style="text-align:center;color:var(--accent)">Create New Post</h2>
-      <input class="input" id="title" placeholder="Title" />
-      <textarea class="input" id="body" placeholder="Write your post..."></textarea>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-primary" type="submit">Publish</button>
-        <div id="msg" style="color:var(--muted)"></div>
-      </div>
-    </form>
+<nav class="nav">
+  <a class="brand" href="/dashboard.html">
+    <div class="logo">DB</div>
+    <div class="brand-text">
+      <span class="brand-name">DarkBlog</span>
+      <span class="brand-sub">New Post</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a class="btn btn-outline btn-sm" href="/dashboard.html">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back
+    </a>
+    <button class="btn btn-outline btn-sm" id="logoutBtn">Logout</button>
+  </div>
+</nav>
+
+<div class="container-md">
+
+  <div class="page-header">
+    <h1 class="page-title">✍️ Write a New Post</h1>
+    <div id="authorChip" style="display:flex;align-items:center;gap:8px;">
+      <div class="avatar avatar-sm" id="authorAvatar">?</div>
+      <span style="font-size:13px;color:var(--muted);">Writing as <strong style="color:var(--text-soft);" id="authorName">...</strong></span>
+    </div>
   </div>
 
+  <div class="write-layout">
+
+    <!-- LEFT: Form -->
+    <div>
+      <div class="card" style="padding:28px;">
+        <form id="createForm">
+
+          <div class="form-group">
+            <label class="form-label" for="title">Post Title</label>
+            <input class="input" id="title" type="text" placeholder="Give your post a compelling title..." required />
+            <div class="char-hint" id="titleHint">0 / 100 characters</div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:8px;">
+            <label class="form-label" for="body">Content</label>
+            <textarea class="input" id="body" placeholder="Share your thoughts, ideas, or story here..." required style="min-height:320px;"></textarea>
+            <div class="char-hint" id="bodyHint">0 words · 0 characters</div>
+          </div>
+
+          <div id="alert" class="alert"></div>
+
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;">
+            <a class="btn btn-outline" href="/dashboard.html">Discard</a>
+            <button class="btn btn-primary" type="submit" id="submitBtn" style="padding:10px 28px;min-width:140px;justify-content:center;">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Publish Post
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- RIGHT: Live Preview -->
+    <div>
+      <div style="position:sticky;top:86px;">
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:12px;">✦ Live Preview</div>
+        <div class="blog-card" style="cursor:default;">
+          <div class="blog-card-bar" style="width:100%;"></div>
+          <div class="blog-card-inner">
+            <div class="blog-card-label">✦ Article</div>
+            <div class="blog-card-title" id="prevTitle" style="color:var(--cyan);opacity:0.5;">Your title will appear here...</div>
+            <div class="blog-card-body" id="prevBody" style="white-space:pre-wrap;font-style:italic;opacity:0.4;">Start typing to see preview...</div>
+          </div>
+          <div class="blog-card-footer">
+            <div class="author-info">
+              <div class="avatar avatar-xs" id="prevAvatar">?</div>
+              <div>
+                <div class="author-name" id="prevAuthor">—</div>
+                <div class="post-date">Just now</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="tips-card">
+          <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;">✦ Writing Tips</div>
+          <ul style="list-style:none;">
+            <li><span>💡</span> Hook readers in the first line</li>
+            <li><span>✂️</span> Keep paragraphs short &amp; punchy</li>
+            <li><span>🎯</span> A clear title gets more clicks</li>
+            <li><span>📖</span> Min 20 characters required</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
-document.getElementById("createForm").addEventListener("submit", async (e)=>{
-  e.preventDefault();
-  const token = localStorage.getItem("token");
-  if(!token) return location.href = "/login.html";
+  const token    = localStorage.getItem("token");
+  const fullName = localStorage.getItem("fullName");
+  if (!token) location.href = "/login.html";
 
-  const title = document.getElementById("title").value.trim();
-  const body = document.getElementById("body").value.trim();
-  const msg = document.getElementById("msg");
+  document.getElementById("logoutBtn").onclick = () => { localStorage.clear(); location.href = "/login.html"; };
 
-  if(!title || !body) { msg.innerText = "Please enter title and body"; return; }
+  // Author chip
+  const initials = (fullName || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  document.getElementById("authorName").textContent   = fullName || "Unknown";
+  document.getElementById("authorAvatar").textContent = initials;
+  document.getElementById("prevAuthor").textContent   = fullName || "Anonymous";
+  document.getElementById("prevAvatar").textContent   = initials;
 
-  try {
-    const res = await axios.post("/api/blogs", { title, body }, {
-      headers: { Authorization: token } // server accepts raw token or "Bearer token"
-    });
-    msg.style.color = "lightgreen";
-    msg.innerText = res.data.message || "Created";
-    setTimeout(()=> location.href="/index.html", 900);
-  } catch(err) {
-    msg.style.color = "#ff8080";
-    msg.innerText = err.response?.data?.message || "Failed";
+  const titleInput = document.getElementById("title");
+  const bodyInput  = document.getElementById("body");
+
+  titleInput.addEventListener("input", () => {
+    const len  = titleInput.value.length;
+    const hint = document.getElementById("titleHint");
+    hint.textContent = `${len} / 100 characters`;
+    if (len > 100)      hint.className = "char-hint err";
+    else if (len > 90)  hint.className = "char-hint warn";
+    else                hint.className = "char-hint";
+    updatePreview();
+  });
+
+  bodyInput.addEventListener("input", () => {
+    const words = bodyInput.value.trim().split(/\s+/).filter(Boolean).length;
+    const chars = bodyInput.value.length;
+    document.getElementById("bodyHint").textContent = `${words} word${words!==1?"s":""} · ${chars} characters`;
+    updatePreview();
+  });
+
+  function updatePreview() {
+    const t = titleInput.value.trim();
+    const b = bodyInput.value.trim();
+    const prevTitle = document.getElementById("prevTitle");
+    const prevBody  = document.getElementById("prevBody");
+
+    if (t) {
+      prevTitle.textContent = t;
+      prevTitle.style.opacity = "1";
+      prevTitle.style.color = "var(--text)";
+      prevTitle.style.fontStyle = "normal";
+    } else {
+      prevTitle.textContent = "Your title will appear here...";
+      prevTitle.style.opacity = "0.5";
+      prevTitle.style.color = "var(--cyan)";
+      prevTitle.style.fontStyle = "normal";
+    }
+    
+    if (b) {
+      prevBody.textContent = b.length > 180 ? b.slice(0, 180) + "…" : b;
+      prevBody.style.opacity = "1";
+      prevBody.style.fontStyle = "normal";
+    } else {
+      prevBody.textContent = "Start typing to see preview...";
+      prevBody.style.opacity = "0.4";
+      prevBody.style.fontStyle = "italic";
+    }
   }
-});
+
+  const form      = document.getElementById("createForm");
+  const alertBox  = document.getElementById("alert");
+  const submitBtn = document.getElementById("submitBtn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    alertBox.className = "alert";
+
+    const title = titleInput.value.trim();
+    const body  = bodyInput.value.trim();
+
+    if (title.length > 100) { showAlert("⚠  Title must be 100 characters or less.", "error"); return; }
+    if (body.length < 20)   { showAlert("⚠  Content must be at least 20 characters.", "error"); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner" style="width:16px;height:16px;margin:0;border-width:2px;"></span> Publishing...`;
+
+    try {
+      await axios.post("/api/blogs", { title, body }, { headers: { Authorization: "Bearer " + token } });
+      showToast("Post published! 🎉", "success");
+      setTimeout(() => location.href = "/dashboard.html", 900);
+    } catch (err) {
+      showAlert("⚠  " + (err.response?.data?.message || "Failed to publish."), "error");
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Publish Post`;
+    }
+  });
+
+  function showAlert(msg, type) {
+    alertBox.textContent = msg;
+    alertBox.className = `alert alert-${type} show`;
+  }
+  function showToast(msg, type = "success") {
+    const tc = document.getElementById("toastContainer");
+    const t  = document.createElement("div");
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    tc.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
 </script>
 </body>
 </html>

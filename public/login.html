@@ -1,55 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login - DarkBlog</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — DarkBlog</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-  <nav class="nav">
-    <div class="brand"><div class="logo">DB</div><div><div style="font-weight:700">DarkBlog</div><div style="font-size:12px;color:var(--muted)">Login</div></div></div>
-    <div class="nav-links">
-      <a class="btn" href="/index.html">Home</a>
-      <a class="btn" href="/signup.html">Signup</a>
-    </div>
-  </nav>
 
-  <div class="container">
-    <form id="loginForm" class="card">
-      <h2 style="text-align:center;color:var(--accent)">Welcome back</h2>
-      <input class="input" id="email" type="email" placeholder="Email" required />
-      <input class="input" id="password" type="password" placeholder="Password" required />
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-primary" type="submit">Login</button>
-        <div id="msg" style="color:var(--muted)"></div>
-      </div>
-    </form>
+<nav class="nav">
+  <a class="brand" href="/login.html">
+    <div class="logo">DB</div>
+    <div class="brand-text">
+      <span class="brand-name">DarkBlog</span>
+      <span class="brand-sub">Welcome back</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a class="btn btn-outline" href="/signup.html">Create Account →</a>
   </div>
+</nav>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-logo-wrap">
+      <div class="auth-logo">DB</div>
+    </div>
+    <h1 class="auth-title">Sign In</h1>
+    <p class="auth-subtitle">Enter your credentials to access your account</p>
+
+    <form id="loginForm" autocomplete="on">
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input class="input" id="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-wrap">
+          <input class="input" id="password" type="password" placeholder="Your password" required autocomplete="current-password" />
+          <button type="button" class="eye-btn" id="eyeBtn" tabindex="-1" aria-label="Toggle password">
+            <svg id="eyeIcon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="alert" class="alert alert-error"></div>
+
+      <button class="btn btn-primary btn-lg" type="submit" id="submitBtn" style="width:100%;justify-content:center;margin-top:6px;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      New to DarkBlog? <a href="/signup.html">Create a free account</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
 
 <script>
-document.getElementById("loginForm").addEventListener("submit", async (e)=>{
-  e.preventDefault();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+  if (localStorage.getItem("token")) location.href = "/dashboard.html";
 
-  const msg = document.getElementById("msg");
-  msg.innerText = "";
+  // Eye toggle
+  document.getElementById("eyeBtn").onclick = () => {
+    const pw = document.getElementById("password");
+    const icon = document.getElementById("eyeIcon");
+    if (pw.type === "password") {
+      pw.type = "text";
+      icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+    } else {
+      pw.type = "password";
+      icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+    }
+  };
 
-  try {
-    const res = await axios.post("/api/login", { email, password });
-    const { token, role, fullName } = res.data;
-    // store token + role + name
-    localStorage.setItem("token", token);
-    localStorage.setItem("role", role);
-    localStorage.setItem("fullName", fullName);
-    // redirect to dashboard
-    location.href = "/dashboard.html";
-  } catch(err) {
-    msg.style.color = "#ff8080";
-    msg.innerText = err.response?.data?.message || "Login failed";
+  const form = document.getElementById("loginForm");
+  const alertBox = document.getElementById("alert");
+  const submitBtn = document.getElementById("submitBtn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    alertBox.classList.remove("show");
+    const email    = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner" style="width:18px;height:18px;margin:0;border-width:2px;"></span> Signing in...`;
+
+    try {
+      const res = await axios.post("/api/login", { email, password });
+      const { token, role, fullName } = res.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
+      localStorage.setItem("fullName", fullName);
+      showToast("Welcome back, " + fullName + "! 👋", "success");
+      setTimeout(() => location.href = "/dashboard.html", 900);
+    } catch (err) {
+      alertBox.textContent = "⚠  " + (err.response?.data?.message || "Login failed. Please try again.");
+      alertBox.classList.add("show");
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In`;
+    }
+  });
+
+  function showToast(msg, type) {
+    const tc = document.getElementById("toastContainer");
+    const t = document.createElement("div");
+    t.className = `toast toast-${type}`;
+    t.textContent = msg;
+    tc.appendChild(t);
+    setTimeout(() => t.remove(), 3500);
   }
-});
 </script>
 </body>
 </html>

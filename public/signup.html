@@ -1,61 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Signup - DarkBlog</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — DarkBlog</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-  <nav class="nav">
-    <div class="brand"><div class="logo">DB</div><div><div style="font-weight:700">DarkBlog</div><div style="font-size:12px;color:var(--muted)">Signup</div></div></div>
-    <div class="nav-links">
-      <a class="btn" href="/index.html">Home</a>
-      <a class="btn" href="/login.html">Login</a>
-    </div>
-  </nav>
 
-  <div class="container">
-    <form id="signupForm" class="card">
-      <h2 style="text-align:center;color:var(--accent)">Create Account</h2>
-      <input class="input" id="fullName" placeholder="Full Name" required />
-      <input class="input" id="email" type="email" placeholder="Email" required />
-      <input class="input" id="password" type="password" placeholder="Password" required />
-      <select class="input" id="role">
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-      </select>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-primary" type="submit">Sign Up</button>
-        <div id="msg" style="color:var(--muted)"></div>
-      </div>
-      <p style="margin-top:12px;color:var(--muted)">Already registered? <a href="/login.html">Login</a></p>
-    </form>
+<nav class="nav">
+  <a class="brand" href="/login.html">
+    <div class="logo">DB</div>
+    <div class="brand-text">
+      <span class="brand-name">DarkBlog</span>
+      <span class="brand-sub">Join for free</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a class="btn btn-outline" href="/login.html">Sign In</a>
   </div>
+</nav>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-logo-wrap">
+      <div class="auth-logo">DB</div>
+    </div>
+    <h1 class="auth-title">Create Account</h1>
+    <p class="auth-subtitle">Join thousands of writers on DarkBlog</p>
+
+    <form id="signupForm" autocomplete="on">
+      <div class="form-group">
+        <label class="form-label" for="fullName">Full Name</label>
+        <input class="input" id="fullName" type="text" placeholder="John Doe" required autocomplete="name" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input class="input" id="email" type="email" placeholder="you@example.com" required autocomplete="email" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-wrap">
+          <input class="input" id="password" type="password" placeholder="At least 6 characters" required autocomplete="new-password" />
+          <button type="button" class="eye-btn" id="eyeBtn" tabindex="-1">
+            <svg id="eyeIcon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <div id="strengthBar" style="height:3px;border-radius:4px;background:var(--border);margin-top:6px;overflow:hidden;">
+          <div id="strengthFill" style="height:100%;width:0%;transition:width 0.3s,background 0.3s;border-radius:4px;"></div>
+        </div>
+        <div id="strengthText" style="font-size:11px;color:var(--muted);margin-top:3px;"></div>
+      </div>
+
+      <!-- Role removed - all signups are users by default -->
+      <input type="hidden" id="role" value="user" />
+
+      <div id="alert" class="alert"></div>
+
+      <button class="btn btn-primary btn-lg" type="submit" id="submitBtn" style="width:100%;justify-content:center;margin-top:6px;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Create Account
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a href="/login.html">Sign in here</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
 
 <script>
-document.getElementById("signupForm").addEventListener("submit", async (e)=>{
-  e.preventDefault();
-  const fullName = document.getElementById("fullName").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  const role = document.getElementById("role").value;
+  if (localStorage.getItem("token")) location.href = "/dashboard.html";
 
-  const msg = document.getElementById("msg");
-  msg.innerText = "";
+  // Eye toggle
+  document.getElementById("eyeBtn").onclick = () => {
+    const pw = document.getElementById("password");
+    const icon = document.getElementById("eyeIcon");
+    pw.type = pw.type === "password" ? "text" : "password";
+    icon.innerHTML = pw.type === "password"
+      ? `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`
+      : `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+  };
 
-  if(!fullName || !email || !password) { msg.innerText = "Please fill all fields"; return; }
+  // Password strength
+  document.getElementById("password").addEventListener("input", function() {
+    const val = this.value;
+    const fill = document.getElementById("strengthFill");
+    const text = document.getElementById("strengthText");
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const levels = [
+      { w: "0%",   c: "transparent", t: "" },
+      { w: "25%",  c: "#ef4444",     t: "Weak" },
+      { w: "50%",  c: "#f59e0b",     t: "Fair" },
+      { w: "75%",  c: "#06b6d4",     t: "Good" },
+      { w: "100%", c: "#10b981",     t: "Strong 💪" },
+    ];
+    const l = levels[Math.min(score, 4)];
+    fill.style.width      = l.w;
+    fill.style.background = l.c;
+    text.textContent      = l.t;
+    text.style.color      = l.c;
+  });
 
-  try {
-    const res = await axios.post("/api/signup", { fullName, email, password, role });
-    msg.style.color = "lightgreen";
-    msg.innerText = res.data.message || "Registered";
-    setTimeout(()=> location.href="/login.html", 1200);
-  } catch(err){
-    msg.style.color = "#ff8080";
-    msg.innerText = err.response?.data?.message || "Server Error";
+  const form      = document.getElementById("signupForm");
+  const alertBox  = document.getElementById("alert");
+  const submitBtn = document.getElementById("submitBtn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    alertBox.className = "alert";
+
+    const fullName = document.getElementById("fullName").value.trim();
+    const email    = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const role     = document.getElementById("role").value;
+
+    if (password.length < 6) {
+      showAlert("⚠  Password must be at least 6 characters.", "error"); return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span class="spinner" style="width:18px;height:18px;margin:0;border-width:2px;"></span> Creating account...`;
+
+    try {
+      await axios.post("/api/signup", { fullName, email, password, role });
+      showAlert("✓  Account created! Redirecting to login...", "success");
+      setTimeout(() => location.href = "/login.html", 1500);
+    } catch (err) {
+      showAlert("⚠  " + (err.response?.data?.message || "Registration failed."), "error");
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg> Create Account`;
+    }
+  });
+
+  function showAlert(msg, type) {
+    alertBox.textContent = msg;
+    alertBox.className = `alert alert-${type} show`;
   }
-});
 </script>
 </body>
 </html>
